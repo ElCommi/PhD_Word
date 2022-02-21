@@ -26,20 +26,97 @@ library_packages_for_app <- function(package_list = package_list)
 library_packages_for_app(package_list)
 
 
+# Wrangling Data ----------------------------------------------------------
+
+merged_file_gdp_merged =
+  read_dta("merged file gdp merged.dta")
+merged_file_gdp_merged$enterprise <-
+  factor(
+    merged_file_gdp_merged$enterprise,
+    levels = c(
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ),
+    labels = c(
+      "Small Agriculture",
+      "Small Utilities",
+      "Small Manufacturing",
+      "Small Construction",
+      "Small Trade",
+      "Small Accomodation",
+      "Small IT",
+      "Small Finance",
+      "Small Education",
+      "Small Health",
+      "Small Arts",
+      "All Small",
+      "Medium Agriculture",
+      "Medium Utilities",
+      "Medium Manufacturing",
+      "Medium Construction",
+      "Medium Trade",
+      "Medium Accomodation",
+      "Medium IT",
+      "Medium Finance",
+      "Medium Education",
+      "Medium Health",
+      "Medium Arts",
+      "All Medium"
+    )
+  )
+
+
+merged_file_gdp_merged$Obs <-
+  as.yearmon(paste(
+    merged_file_gdp_merged$year,
+    merged_file_gdp_merged$month,
+    sep = "-"
+  ))
+
+bankdata <- merged_file_gdp_merged %>% slice(1:1656)
+
+
+
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
-  output$distPlot <- renderPlot({
-    # generate bins based on input$bins from ui.R
-    x    <- faithful[, 2]
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    
-    # draw the histogram with the specified number of bins
-    hist(x,
-         breaks = bins,
-         col = 'darkgray',
-         border = 'white')
-    
-  })
+  
+  filtered_bankdata = reactive({
+    bankdata %>%
+    filter (enterprise == input$business_type)})
+  
+  output$time_series = 
+    renderPlot({
+      ggplot(filtered_bankdata(), aes(x = Obs, y = repayments)) +
+        geom_line(colour = "blue")+
+        geom_smooth()+
+        labs(title =  sprintf("Repayments For %s", input$business_type),
+             x = "Year Month",
+             y = "Repayments £mn"
+             ) +
+        theme_hc()
+    })
   
 })
