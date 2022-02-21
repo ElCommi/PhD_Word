@@ -1,13 +1,24 @@
-#
-# This is the server logic of a Shiny web application. You can run the
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+# Load Packages -----------------------------------------------------------
+package_list <-
+  list(
+    "data.table",
+    "dplyr",
+    "foreign",
+    "gganimate",
+    "ggplot2",
+    "ggthemes",
+    "haven",
+    "openxlsx",    
+    "readxl",
+    "plotly",
+    "seasonalview",
+    "shiny",
+    "TTR",  
+    "zoo"
+  )
 
-library(shiny)
+library_packages_for_app(package_list)
+
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
