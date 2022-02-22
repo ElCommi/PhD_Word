@@ -13,6 +13,7 @@ package_list <-
     "plotly",
     "seasonalview",
     "shiny",
+    "shinythemes",
     "TTR",
     "zoo"
   )
@@ -102,20 +103,29 @@ bankdata <- merged_file_gdp_merged %>% slice(1:1656)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
-  
   filtered_bankdata = reactive({
     bankdata %>%
-    filter (enterprise == input$business_type)})
+      filter(enterprise == input$business_type)
+  })
   
-  output$time_series = 
+  output$time_series =
     renderPlot({
-      ggplot(filtered_bankdata(), aes(x = Obs, y = repayments)) +
-        geom_line(colour = "blue")+
-        geom_smooth()+
-        labs(title =  sprintf("Repayments For %s", input$business_type),
-             x = "Year Month",
-             y = "Repayments £mn"
-             ) +
+      ggplot(filtered_bankdata(),
+             aes_string(x = "Obs",
+                        y = input$finance_type)) +
+        geom_line(colour = "blue", show.legend = TRUE) +
+        geom_smooth(show.legend = TRUE) +
+        labs(
+          title =  sprintf("%s For %s", input$finance_type, input$business_type),
+          x = "Year Month",
+          y = sprintf("%s %s", input$finance_type, 
+                      if (input$finance_type != "loanfacilitiesapproved") 
+            {
+            "£mn"
+          } else {
+            ""
+          })
+        ) +
         theme_hc()
     })
   

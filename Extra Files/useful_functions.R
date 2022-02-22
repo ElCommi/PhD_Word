@@ -15,7 +15,8 @@ package_list <-
     "seasonalview",
     "shiny",
     "TTR",  
-    "zoo"
+    "zoo",
+    "shiny_themes"
   )
 
 install_packages_for_app <- function(package_list = package_list)

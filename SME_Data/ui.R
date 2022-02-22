@@ -1,8 +1,13 @@
 
+
+
 # Tab 1: SME Lending Data Uni Variate -------------------------------------
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
+  #theme = shinytheme("flatly"), Themescurrently broken, check back later.
+  
+  
   # Application title
   titlePanel("SME Lending Data"),
   
@@ -38,9 +43,15 @@ shinyUI(fluidPage(
         "All Medium" = "All Medium"
       ),
       selected = 1
-    )
+    ),
+
+    selectInput("finance_type",label = h3("Select Finance Variable"),
+                choices = list("Repayments" = "repayments",
+                               "Total Outstanding Loans" = "totaloutstanding",
+                               "Loan Facilities Approved" = "loanfacilitiesapproved",
+                               "New Loans £mn" = "new_loans_mn"
+                               ))
   ),
   # Show a plot of the generated distribution
   mainPanel(plotOutput("time_series")))
 ))
-
