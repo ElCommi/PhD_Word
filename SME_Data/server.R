@@ -108,12 +108,15 @@ shinyServer(function(input, output) {
       filter(enterprise == input$business_type)
   })
   
+  
+  #relabel newloans_ to fit with below. Recode SA values
   output$time_series =
     renderPlot({
       ggplot(filtered_bankdata(),
              aes_string(x = "Obs",
                         y = input$finance_type)) +
         geom_line(colour = "blue", show.legend = TRUE) +
+        geom_line(aes_string( y= paste0(input$finance_type,"sa"))) +
         geom_smooth(show.legend = TRUE) +
         labs(
           title =  sprintf("%s For %s", input$finance_type, input$business_type),
