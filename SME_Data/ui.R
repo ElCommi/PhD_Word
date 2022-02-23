@@ -50,7 +50,11 @@ shinyUI(fluidPage(
                                "Total Outstanding Loans" = "totaloutstanding",
                                "Loan Facilities Approved" = "loanfacilitiesapproved",
                                "New Loans £mn" = "new_loans_mn"
-                               ))
+                               )),
+    
+    selectInput("smoothing_applied", label = h3("Apply Smoothing"), 
+                choices = list("No" = 1, "Yes" = 2), 
+                selected = 1)
   ),
   # Show a plot of the generated distribution
   mainPanel(plotOutput("time_series")))

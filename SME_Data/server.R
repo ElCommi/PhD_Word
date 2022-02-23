@@ -107,29 +107,49 @@ shinyServer(function(input, output) {
     bankdata %>%
       filter(enterprise == input$business_type)
   })
+  plotWithSmoothing = renderPlot({
+    ggplot(filtered_bankdata(),
+           aes_string(x = "Obs",
+                      y = input$finance_type)) +
+      geom_line(colour = "blue", show.legend = TRUE) +
+      geom_smooth(show.legend = TRUE) +
+      labs(
+        title =  sprintf("%s For %s", input$finance_type, input$business_type),
+        x = "Year Month",
+        y = sprintf("%s %s", input$finance_type, 
+                    if (input$finance_type != "loanfacilitiesapproved") 
+                    {
+                      "£mn"
+                    } else {
+                      ""
+                    })
+      ) +
+      theme_hc()})
   
+  plotWithoutSmoothing = renderPlot({
+    ggplot(filtered_bankdata(),
+           aes_string(x = "Obs",
+                      y = input$finance_type)) +
+      geom_line(colour = "blue", show.legend = TRUE) +
+      labs(
+        title =  sprintf("%s For %s", input$finance_type, input$business_type),
+        x = "Year Month",
+        y = sprintf("%s %s", input$finance_type, 
+                    if (input$finance_type != "loanfacilitiesapproved") 
+                    {
+                      "£mn"
+                    } else {
+                      ""
+                    })
+      ) +
+      theme_hc()})
   
+  finance_plot <- reactive({
+    ifelse(input$smoothing_applied == 1, plotWithoutSmoothing,plotWithSmoothing)
+  })
+  
+  output$time_series = finance_plot
+
+  })
   #relabel newloans_ to fit with below. Recode SA values
-  output$time_series =
-    renderPlot({
-      ggplot(filtered_bankdata(),
-             aes_string(x = "Obs",
-                        y = input$finance_type)) +
-        geom_line(colour = "blue", show.legend = TRUE) +
-        geom_line(aes_string( y= paste0(input$finance_type,"sa"))) +
-        geom_smooth(show.legend = TRUE) +
-        labs(
-          title =  sprintf("%s For %s", input$finance_type, input$business_type),
-          x = "Year Month",
-          y = sprintf("%s %s", input$finance_type, 
-                      if (input$finance_type != "loanfacilitiesapproved") 
-            {
-            "£mn"
-          } else {
-            ""
-          })
-        ) +
-        theme_hc()
-    })
   
-})
