@@ -1,30 +1,15 @@
 # Load Packages -----------------------------------------------------------
-package_list <-
-  list(
-    "data.table",
-    "dplyr",
-    "foreign",
-    "gganimate",
-    "ggplot2",
-    "ggthemes",
-    "haven",
-    "openxlsx",
-    "readxl",
-    "plotly",
-    "seasonalview",
-    "shiny",
-    "shinythemes",
-    "TTR",
-    "zoo"
-  )
 
-library_packages_for_app <- function(package_list = package_list)
-{
-  for (package in package_list) {
-    library(package, character.only = TRUE)
-  }
-}
-library_packages_for_app(package_list)
+library("dplyr")
+library ("foreign")
+library("ggplot2")
+library("ggthemes")
+library("haven")
+library("openxlsx")
+library("readxl")
+library("shiny")
+library("shinythemes")
+library("zoo")
 
 
 # Wrangling Data ----------------------------------------------------------
@@ -107,7 +92,11 @@ shinyServer(function(input, output) {
     bankdata %>%
       filter(enterprise == input$business_type)
   })
-  plotWithSmoothing = renderPlot({
+
+# Finance Plots -----------------------------------------------------------
+
+  
+  financeWithSmoothing = renderPlot({
     ggplot(filtered_bankdata(),
            aes_string(x = "Obs",
                       y = input$finance_type)) +
@@ -126,7 +115,7 @@ shinyServer(function(input, output) {
       ) +
       theme_hc()})
   
-  plotWithoutSmoothing = renderPlot({
+  financeWithoutSmoothing = renderPlot({
     ggplot(filtered_bankdata(),
            aes_string(x = "Obs",
                       y = input$finance_type)) +
@@ -143,13 +132,52 @@ shinyServer(function(input, output) {
                     })
       ) +
       theme_hc()})
-  
-  finance_plot <- reactive({
-    ifelse(input$smoothing_applied == 1, plotWithoutSmoothing,plotWithSmoothing)
-  })
-  
-  output$time_series = finance_plot
 
-  })
-  #relabel newloans_ to fit with below. Recode SA values
+# Earnings Plots ----------------------------------------------------------
+
   
+  earningsWithSmoothing = renderPlot({
+    ggplot(filtered_bankdata(),
+           aes_string(x = "Obs",
+                      y = input$employment_variable)) +
+      geom_line(colour = "blue", show.legend = TRUE) +
+      geom_smooth(show.legend = TRUE) +
+      labs(
+        title =  sprintf("%s For %s", input$employment_variable, input$business_type),
+        x = "Year Month",
+        y = sprintf("%s %s", input$employment_variable, " in £")
+      ) +
+      theme_hc()})
+  
+  earningsWithoutSmoothing = renderPlot({
+    ggplot(filtered_bankdata(),
+           aes_string(x = "Obs",
+                      y = input$employment_variable)) +
+      geom_line(colour = "blue", show.legend = TRUE) +
+      labs(
+        title =  sprintf("%s For %s", input$employment_variable, input$business_type),
+        x = "Year Month",
+        y = sprintf("%s %s", input$employment_variable, " in £")
+      ) +
+      theme_hc()})
+
+  finance_plot <- reactive({
+    if (input$smoothing_applied == 1) {
+      financeWithoutSmoothing
+    } else {
+      financeWithSmoothing
+    }
+  })
+  earnings_plot <- reactive({
+    if (input$smoothing_applied1 == 1) {
+      earningsWithoutSmoothing
+    } else {
+      earningsWithSmoothing
+    }
+  })
+  
+  observe({
+  output$time_series_finance = finance_plot()
+  output$earnings = earnings_plot()
+  })
+  })
