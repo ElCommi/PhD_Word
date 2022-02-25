@@ -5,9 +5,9 @@ account: elcommi
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5721707
-bundleId: 5611768
+bundleId: 5615597
 url: https://elcommi.shinyapps.io/SME_Data/
-when: 1645658786.50009
-lastSyncTime: 1645658786.50009
+when: 1645749157.44241
+lastSyncTime: 1645749157.44241
 asMultiple: FALSE
 asStatic: FALSE

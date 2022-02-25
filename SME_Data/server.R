@@ -82,9 +82,17 @@ merged_file_gdp_merged$Obs <-
   ))
 
 bankdata <- merged_file_gdp_merged %>% slice(1:1656)
+#bankdata <- rename(bankdata, )
 
+labelsForFinanceGraph <- c("repayments" = "Repayments",
+                          "totaloutstanding" =  "Total Outstanding Loans",
+                          "loanfacilitiesapproved" = "Loan Facilities Approved" ,
+                          "new_loans_mn" = "New Loans £mn")
+labelsForEmploymentGraph <- c("averageweeklyearnings" = "Average Weekly Earnings",
+                              "avgwe1" = "Adjusted Average Weekly Earnings")
 
-
+earningsLabel = reactive({labelsForEmploymentGraph[[input$employment_variable]]
+  })
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -96,15 +104,16 @@ shinyServer(function(input, output) {
 # Finance Plots -----------------------------------------------------------
 
   
-  financeWithSmoothing = renderPlot({
-    ggplot(filtered_bankdata(),
+  financeWithSmoothing = renderPlot({ 
+    ggplot(filtered_bankdata(), 
            aes_string(x = "Obs",
                       y = input$finance_type)) +
       geom_line(colour = "blue", show.legend = TRUE) +
       geom_smooth(show.legend = TRUE) +
       labs(
-        title =  sprintf("%s For %s", input$finance_type, input$business_type),
+        title =  sprintf("%s For %s", labelsForFinanceGraph[[input$finance_type]], input$business_type),
         x = "Year Month",
+        caption = "Data From: British Banking Authority/UK Finance | Plot by: Gerard Gallagher",
         y = sprintf("%s %s", input$finance_type, 
                     if (input$finance_type != "loanfacilitiesapproved") 
                     {
@@ -121,9 +130,10 @@ shinyServer(function(input, output) {
                       y = input$finance_type)) +
       geom_line(colour = "blue", show.legend = TRUE) +
       labs(
-        title =  sprintf("%s For %s", input$finance_type, input$business_type),
+        title =  sprintf("%s For %s", labelsForFinanceGraph[[input$finance_type]], input$business_type),
         x = "Year Month",
-        y = sprintf("%s %s", input$finance_type, 
+        caption = "Data From: British Banking Authority/UK Finance | Plot by: Gerard Gallagher",
+        y = sprintf("%s %s", labelsForFinanceGraph[[input$finance_type]], 
                     if (input$finance_type != "loanfacilitiesapproved") 
                     {
                       "£mn"
@@ -143,9 +153,10 @@ shinyServer(function(input, output) {
       geom_line(colour = "blue", show.legend = TRUE) +
       geom_smooth(show.legend = TRUE) +
       labs(
-        title =  sprintf("%s For %s", input$employment_variable, input$business_type),
+        title =  sprintf("%s For %s", labelsForEmploymentGraph[[input$employment_variable]], input$business_type),
         x = "Year Month",
-        y = sprintf("%s %s", input$employment_variable, " in £")
+        caption = "Data From ONS/LFS | Plot by: Gerard Gallagher",
+        y = sprintf("%s %s", labelsForEmploymentGraph[[input$employment_variable]], " in £")
       ) +
       theme_hc()})
   
@@ -155,9 +166,10 @@ shinyServer(function(input, output) {
                       y = input$employment_variable)) +
       geom_line(colour = "blue", show.legend = TRUE) +
       labs(
-        title =  sprintf("%s For %s", input$employment_variable, input$business_type),
+        title =  sprintf("%s For %s", labelsForEmploymentGraph[[input$employment_variable]], input$business_type),
         x = "Year Month",
-        y = sprintf("%s %s", input$employment_variable, " in £")
+        caption = "Data From ONS/LFS | Plot by: Gerard Gallagher",
+        y = sprintf("%s %s",labelsForEmploymentGraph[[input$employment_variable]], " in £")
       ) +
       theme_hc()})
 
